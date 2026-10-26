@@ -1,0 +1,42 @@
+/* "Where to eat" map on the summary. Prefix mp-. */
+.mp { margin: 0 0 32px; }
+.mp-map {
+  height: 320px; border-radius: var(--radius); overflow: hidden;
+  border: 1px solid var(--border); background: var(--surface-2);
+  z-index: 0; /* keep Leaflet panes under the toolbar/toast */
+}
+@media (min-width: 640px) { .mp-map { height: 420px; } }
+.mp-missing { margin: 8px 0 0; font-size: .82rem; }
+.mp-fallback { margin: 0; padding: 24px; text-align: center; }
+
+/* Numbered pins, coloured like the rank medals */
+.mp-pin-wrap { background: none; border: 0; }
+.mp-pin {
+  display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%;
+  background: #fff; color: #2a211b; border: 2px solid #2a211b;
+  font: 800 13px/1 var(--font-display, Georgia, serif);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .35);
+  -webkit-print-color-adjust: exact; print-color-adjust: exact;
+}
+.mp-pin--1, .mp-pin--2, .mp-pin--3 { color: #fff; border-color: #fff; }
+.mp-pin--1 { background: var(--gold, #e8a317); }
+.mp-pin--2 { background: var(--silver, #9aa3ad); }
+.mp-pin--3 { background: var(--bronze, #b8733d); }
+
+/* Popup */
+.mp-pop { display: flex; flex-direction: column; gap: 3px; font: 13px/1.35 var(--font-body, system-ui, sans-serif); }
+.mp-pop img { width: 100%; height: 96px; object-fit: cover; border-radius: 6px; margin-bottom: 4px; }
+.mp-pop strong { font: 700 14px/1.25 var(--font-display, Georgia, serif); }
+.mp-pop span { color: #6b5c4f; }
+.mp .mp-pop a { color: var(--accent); font-weight: 600; } /* beats .leaflet-container a */
+
+@media print {
+  .mp { break-inside: avoid; page-break-inside: avoid; margin-bottom: 18px; }
+  /* Same pixel size as on screen, scaled to the page (set by js/map.js). */
+  .mp-map {
+    width: var(--mp-w, 100%); height: var(--mp-h, 3.6in);
+    zoom: var(--mp-zoom, 1); margin: 0 auto; border-radius: 0;
+  }
+  .mp-map .leaflet-control-zoom { display: none; }
+  .mp-map, .mp-map * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

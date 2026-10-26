@@ -1,5 +1,6 @@
 // Screen 3: the shareable / printable food guide.
 import { getTrip, escapeHtml, mapsSearchUrl } from './state.js';
+import { mapSectionHtml, mountMap, standaloneMapScript, LEAFLET_CSS } from './map.js';
 
 const FONT_LINKS = `<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,6 +31,8 @@ function safeUrl(url) {
   // Only allow http(s) links in the guide.
   return /^https?:\/\//i.test(url || '') ? url : '';
 }
+
+const pinUrl = (dish) => safeUrl(mapsUrlFor(dish));
 
 function slugify(s) {
   return s.toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '')
@@ -92,7 +95,8 @@ function restItem(dish, i) {
   </li>`;
 }
 
-function guideHtml(trip) {
+// `live` is the on-screen guide; false for the downloaded page.
+function guideHtml(trip, live = true) {
   const dishes = trip.dishes || [];
   const top = dishes.slice(0, 3);
   const rest = dishes.slice(3);
@@ -101,6 +105,7 @@ function guideHtml(trip) {
   const author = (trip.author || '').trim();
 
   return `<article class="sm-guide">
+    <div class="sm-page1">
     <header class="sm-head">
       <p class="sm-eyebrow">Have You Eaten Yet?</p>
       <h1 class="sm-title">${escapeHtml(tripName(trip))}</h1>
@@ -112,6 +117,9 @@ function guideHtml(trip) {
       <h2 class="sm-section-title" id="sm-top-h"><span>The Top ${top.length}</span></h2>
       <ol class="sm-podium sm-podium-${top.length}">${top.map(featureCard).join('')}</ol>
     </section>` : ''}
+    </div>
+
+    ${mapSectionHtml(trip, live)}
 
     ${rest.length ? `<section class="sm-rest" aria-labelledby="sm-rest-h">
       <h2 class="sm-section-title" id="sm-rest-h"><span>The rest</span></h2>
@@ -169,7 +177,10 @@ async function readCss(file) {
 }
 
 async function buildStandaloneHtml(trip) {
-  const [base, summary] = await Promise.all([readCss('css/base.css'), readCss('css/summary.css')]);
+  const [base, summary, map, leaflet, mapScript] = await Promise.all([
+    readCss('css/base.css'), readCss('css/summary.css'), readCss('css/map.css'), readCss(LEAFLET_CSS),
+    standaloneMapScript(trip, pinUrl),
+  ]);
   const title = `${tripName(trip)} — food guide`;
   return `<!doctype html>
 <html lang="en" data-theme="light">
@@ -181,13 +192,16 @@ ${FONT_LINKS}
 <style>
 ${base}
 ${summary}
+${leaflet}
+${map}
 :root { color-scheme: light; }
 </style>
 </head>
 <body class="sm-standalone">
 <main id="app">
-${guideHtml(trip)}
+${guideHtml(trip, false)}
 </main>
+${mapScript}
 </body>
 </html>`;
 }
@@ -268,7 +282,9 @@ export function render(container) {
   }
 
   container.addEventListener('click', onClick);
+  const unmountMap = mountMap(container, trip, pinUrl);
   return () => {
+    unmountMap();
     container.removeEventListener('click', onClick);
     clearTimeout(toastTimer);
   };

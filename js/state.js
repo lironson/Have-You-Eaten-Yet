@@ -17,7 +17,9 @@
 //     name: string,        // restaurant name
 //     address: string,     // optional display address
 //     mapsUrl: string,     // Google Maps link
-//     website: string      // optional website
+//     website: string,     // optional website
+//     lat?, lon?: number,  // map pin (from search, or looked up on the summary)
+//     geo?: 'none'         // lookup found nothing; don't retry
 //   }
 // }
 

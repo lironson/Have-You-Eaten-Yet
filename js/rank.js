@@ -191,7 +191,9 @@ export function render(container) {
     const data = await res.json();
     const out = (Array.isArray(data) ? data : []).map((r) => {
       const name = r.name || String(r.display_name || '').split(',')[0].trim();
-      return { name, address: shortAddress(r.display_name, name) };
+      const lat = Number(r.lat);
+      const lon = Number(r.lon);
+      return { name, address: shortAddress(r.display_name, name), ...(Number.isFinite(lat) && Number.isFinite(lon) && { lat, lon }) };
     }).filter((r) => r.name);
     searchCache.set(q, out);
     return out;
@@ -285,7 +287,8 @@ export function render(container) {
       const city = (getTrip().name || '').trim();
       setPlace(id, { name: opt.name, address: '', mapsUrl: mapsSearchUrl(city ? `${opt.name} ${city}` : opt.name), website: '' });
     } else {
-      setPlace(id, { name: opt.name, address: opt.address, mapsUrl: mapsSearchUrl(`${opt.name} ${opt.address}`.trim()), website: '' });
+      const coords = opt.lat !== undefined ? { lat: opt.lat, lon: opt.lon } : {};
+      setPlace(id, { name: opt.name, address: opt.address, mapsUrl: mapsSearchUrl(`${opt.name} ${opt.address}`.trim()), website: '', ...coords });
     }
   }
 

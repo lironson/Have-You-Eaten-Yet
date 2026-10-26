@@ -2,24 +2,10 @@
 // PeerJS. PeerJS's free public broker only introduces the two phones; photos
 // travel straight between them and are never stored on a server.
 
+import { loadScript } from './load.js';
+
 export const MAX_IMAGE_CHARS = 4_000_000; // a 1600px JPEG data URL is well under this
 export const MAX_PER_GUEST = 100;
-
-const scripts = new Map();
-
-// Libraries are vendored and only loaded when someone actually uses invites.
-function loadScript(src) {
-  if (!scripts.has(src)) {
-    scripts.set(src, new Promise((resolve, reject) => {
-      const el = document.createElement('script');
-      el.src = src;
-      el.onload = resolve;
-      el.onerror = () => { scripts.delete(src); reject(new Error(`Could not load ${src}`)); };
-      document.head.appendChild(el);
-    }));
-  }
-  return scripts.get(src);
-}
 
 export const loadPeer = () => loadScript('vendor/peerjs.min.js').then(() => window.Peer);
 export const loadQr = () => loadScript('vendor/qrcode.js').then(() => window.qrcode);

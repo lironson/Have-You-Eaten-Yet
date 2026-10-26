@@ -12,6 +12,7 @@
 //   image: string,         // downscaled JPEG data URL
 //   title: string,         // dish name, e.g. "Tonkotsu ramen"
 //   note: string,          // optional one-liner tip
+//   from?: string,         // set when a friend sent it via the invite QR
 //   place: null | {
 //     name: string,        // restaurant name
 //     address: string,     // optional display address

@@ -1,8 +1,7 @@
 // Screen 1: Upload. Name the trip and add food photos.
 import { getTrip, updateTrip, subscribe, newId, escapeHtml } from './state.js';
-
-const MAX_EDGE = 1600;
-const JPEG_QUALITY = 0.82;
+import { looksLikeImage, downscale } from './images.js';
+import { openInvite } from './invite.js';
 
 export function render(container) {
   const trip = getTrip();
@@ -33,6 +32,9 @@ export function render(container) {
         <span class="up-drop-title">Add food photos</span>
         <span id="up-drop-hint" class="up-drop-hint muted">Tap to choose from your camera roll, or drag photos here</span>
       </button>
+
+      <button type="button" class="btn iv-open">👥 Collect photos from friends</button>
+      <div class="iv-slot" hidden></div>
 
       <div class="up-status" role="status" aria-live="polite">
         <div class="up-progress" hidden>
@@ -67,9 +69,12 @@ export function render(container) {
   const countEl = $('.up-count');
   const resetBtn = $('.up-reset');
   const nextBtn = $('.up-next');
+  const inviteBtn = $('.iv-open');
+  const inviteSlot = $('.iv-slot');
 
   let alive = true;
   let busy = false;
+  let invite = null;
 
   // --- Trip fields -------------------------------------------------------
   nameInput.addEventListener('input', () => {
@@ -91,6 +96,7 @@ export function render(container) {
     grid.innerHTML = dishes.map((d, i) => `
       <li class="up-thumb" data-id="${escapeHtml(d.id)}">
         <img src="${escapeHtml(d.image)}" alt="${escapeHtml(d.title || `Photo ${i + 1}`)}" loading="lazy" decoding="async">
+        ${d.from ? `<span class="up-from">from ${escapeHtml(d.from)}</span>` : ''}
         <button type="button" class="up-remove" data-id="${escapeHtml(d.id)}"
           aria-label="Remove ${escapeHtml(d.title || `photo ${i + 1}`)}">×</button>
       </li>
@@ -116,7 +122,16 @@ export function render(container) {
   });
 
   nextBtn.addEventListener('click', () => {
+    if (invite && invite.guests() > 0 && !confirm('Friends are still connected. Stop collecting photos and move on?')) return;
     if (getTrip().dishes.length > 0) location.hash = 'rank';
+  });
+
+  // --- Invite friends (optional, phone to phone) --------------------------
+  inviteBtn.addEventListener('click', () => {
+    inviteBtn.hidden = true;
+    invite = openInvite(inviteSlot, {
+      onStop: () => { invite = null; inviteBtn.hidden = false; },
+    });
   });
 
   // --- File picking ------------------------------------------------------
@@ -220,69 +235,9 @@ export function render(container) {
 
   return () => {
     alive = false;
+    if (invite) invite.stop();
     unsubscribe();
     window.removeEventListener('dragover', preventWindowDrop);
     window.removeEventListener('drop', preventWindowDrop);
   };
-}
-
-// --- Image helpers ---------------------------------------------------------
-
-function looksLikeImage(file) {
-  if (file.type && file.type.startsWith('image/')) return true;
-  // Some platforms report HEIC (and others) with an empty type.
-  return !file.type && /\.(jpe?g|png|gif|webp|heic|heif|avif|bmp)$/i.test(file.name || '');
-}
-
-async function decode(file) {
-  if ('createImageBitmap' in window) {
-    try {
-      const bmp = await createImageBitmap(file, { imageOrientation: 'from-image' });
-      return { source: bmp, width: bmp.width, height: bmp.height, done: () => bmp.close?.() };
-    } catch {
-      // Fall through to <img>, which also applies EXIF orientation in modern browsers.
-    }
-  }
-  const url = URL.createObjectURL(file);
-  try {
-    const img = new Image();
-    img.decoding = 'async';
-    await new Promise((resolve, reject) => {
-      img.onload = resolve;
-      img.onerror = () => reject(new Error('Could not decode image'));
-      img.src = url;
-    });
-    if (!img.naturalWidth || !img.naturalHeight) throw new Error('Empty image');
-    return {
-      source: img,
-      width: img.naturalWidth,
-      height: img.naturalHeight,
-      done: () => URL.revokeObjectURL(url),
-    };
-  } catch (err) {
-    URL.revokeObjectURL(url);
-    throw err;
-  }
-}
-
-async function downscale(file) {
-  const { source, width, height, done } = await decode(file);
-  try {
-    const scale = Math.min(1, MAX_EDGE / Math.max(width, height));
-    const w = Math.max(1, Math.round(width * scale));
-    const h = Math.max(1, Math.round(height * scale));
-    const canvas = document.createElement('canvas');
-    canvas.width = w;
-    canvas.height = h;
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#fff'; // JPEG has no alpha; avoid black backgrounds on PNGs.
-    ctx.fillRect(0, 0, w, h);
-    ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(source, 0, 0, w, h);
-    const dataUrl = canvas.toDataURL('image/jpeg', JPEG_QUALITY);
-    if (!dataUrl.startsWith('data:image/jpeg')) throw new Error('Encoding failed');
-    return dataUrl;
-  } finally {
-    done();
-  }
 }

@@ -4,16 +4,20 @@ import { loadTrip, getTrip, subscribe } from './state.js';
 import * as upload from './upload.js';
 import * as rank from './rank.js';
 import * as summary from './summary.js';
+import * as join from './join.js';
 
-const screens = { upload, rank, summary };
+const screens = { upload, rank, summary, join };
 const app = document.getElementById('app');
 let cleanup = null;
 
+// "#join=<id>" is a friend sending photos; the route name is before the "=".
+const hashRoute = () => location.hash.slice(1).split('=')[0];
+
 function currentRoute() {
-  const name = location.hash.replace('#', '');
+  const name = hashRoute();
   if (!screens[name]) return 'upload';
   // Rank and summary need photos first.
-  if (name !== 'upload' && getTrip().dishes.length === 0) return 'upload';
+  if (name !== 'upload' && name !== 'join' && getTrip().dishes.length === 0) return 'upload';
   return name;
 }
 
@@ -27,7 +31,8 @@ function updateNav(route) {
 
 function show() {
   const route = currentRoute();
-  if (location.hash !== '#' + route) history.replaceState(null, '', '#' + route);
+  if (hashRoute() !== route) history.replaceState(null, '', '#' + route);
+  document.body.classList.toggle('route-join', route === 'join');
   if (typeof cleanup === 'function') cleanup();
   app.innerHTML = '';
   cleanup = screens[route].render(app);

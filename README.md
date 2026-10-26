@@ -3,6 +3,8 @@
 Turn your trip's food photos into a ranked, shareable guide for friends visiting the same place.
 
 1. **Upload** – pick dish/restaurant photos from your phone. They're downscaled on-device.
+   Optionally tap **Collect photos from friends** to show a QR code: friends scan it and their photos
+   go straight to your phone over WebRTC (PeerJS), with no storage server.
 2. **Rank** – drag to reorder (works with touch) or, if you can't decide, run a 1v1 tournament
    bracket that picks your top 4. Add a dish title and tag the restaurant
    via a quick search (OpenStreetMap, no API key) that links to Google Maps.
@@ -20,7 +22,10 @@ python3 -m http.server 8000
 # open http://localhost:8000
 ```
 
-Any static host works (e.g. GitHub Pages: Settings → Pages → deploy from branch).
+Any static host works (e.g. GitHub Pages: Settings → Pages → deploy from branch). The friends QR
+needs the site on a public HTTPS URL, since a QR pointing at `localhost` won't open on other phones.
+PeerJS's free public broker is used only to introduce the phones; to test against a local
+PeerServer, add `?peerserver=127.0.0.1:9000` to the URL.
 
 ## Layout
 
@@ -32,4 +37,7 @@ Any static host works (e.g. GitHub Pages: Settings → Pages → deploy from bra
 | `js/rank.js`, `css/rank.css` | Ranking screen |
 | `js/bracket.js`, `css/bracket.css` | "Can't decide?" tournament bracket overlay |
 | `js/summary.js`, `css/summary.css` | Printable summary |
+| `js/invite.js`, `js/join.js`, `js/peer.js`, `css/invite.css` | Friends QR: host panel, guest screen (`#join=<id>`), shared helpers |
+| `js/images.js` | Shared photo decode + downscale |
+| `vendor/` | PeerJS 1.5.4 and qrcode-generator 1.4.4 (MIT), loaded only when invites are used |
 | `css/base.css` | Design tokens and shared components |

@@ -7,6 +7,9 @@ const FONT_LINKS = `<link rel="preconnect" href="https://fonts.googleapis.com">
 
 const MEDALS = ['gold', 'silver', 'bronze'];
 
+// Public home of the app, linked from the guide's footer (screen, PDF, download).
+const SITE_URL = 'https://lironson.github.io/Have-You-Eaten-Yet-/';
+
 function tripName(trip) {
   return (trip.name || '').trim() || 'My Food Trip';
 }
@@ -115,7 +118,7 @@ function guideHtml(trip) {
       <ol class="sm-list">${rest.map((d, i) => restItem(d, i + 3)).join('')}</ol>
     </section>` : ''}
 
-    <footer class="sm-foot">Made with <strong>Have You Eaten Yet?</strong></footer>
+    <footer class="sm-foot">Made with <a class="sm-foot-link" href="${SITE_URL}" target="_blank" rel="noopener"><strong>Have You Eaten Yet?</strong></a><span class="sm-foot-url"> · ${SITE_URL.replace(/^https:\/\//, '').replace(/\/$/, '')}</span></footer>
   </article>`;
 }
 
@@ -128,6 +131,7 @@ export function plainText(trip) {
     if (maps) line += ` — ${maps}`;
     lines.push(line);
   });
+  lines.push('', `Made with Have You Eaten Yet? ${SITE_URL}`);
   return lines.join('\n');
 }
 

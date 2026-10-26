@@ -21,7 +21,7 @@ export function render(container) {
       <header class="rk-head">
         <h1>Rank your bites</h1>
         <p class="muted">Drag to reorder. #1 is the best thing you ate.</p>
-        <p class="rk-cta" hidden>Can't decide? <button type="button" class="rk-cta-btn" data-rk-bracket>Start a tournament bracket →</button></p>
+        <p class="rk-cta" hidden>Can't decide? <button type="button" class="rk-cta-btn" data-rk-bracket>Start a 1v1 tournament bracket →</button></p>
       </header>
       <ol class="rk-list" aria-label="Ranked dishes"></ol>
       <p class="visually-hidden" aria-live="polite" data-rk-live></p>

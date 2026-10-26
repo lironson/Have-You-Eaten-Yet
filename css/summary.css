@@ -174,6 +174,10 @@
   letter-spacing: .06em;
 }
 .sm-foot strong { font-family: var(--font-display); color: var(--text); font-weight: 600; }
+.sm-foot-link { color: inherit; text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 3px; }
+.sm-foot-link:hover strong { color: var(--accent); }
+/* The bare URL is only for paper, where the link can't be clicked. */
+.sm-foot-url { display: none; }
 
 /* Toast */
 .sm-toast {
@@ -239,4 +243,5 @@
   .sm-link { color: var(--accent); border-bottom: 0; text-decoration: none; font-size: 9pt; }
   .sm-arrow { display: none; }
   .sm-foot { break-inside: avoid; }
+  .sm-foot-url { display: inline; }
 }

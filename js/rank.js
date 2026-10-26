@@ -67,26 +67,21 @@ export function render(container) {
     const label = title ? escapeHtml(title) : `dish ${rank}`;
     return `
       <li class="rk-card card" data-id="${escapeHtml(dish.id)}">
-        <div class="rk-top">
-          <span class="rk-badge${medal}" aria-label="Rank ${rank}">#${rank}</span>
-          <button type="button" class="rk-thumb" data-act="zoom" aria-label="Enlarge photo of ${label}">
-            <img src="${escapeHtml(dish.image || '')}" alt="" loading="lazy" draggable="false">
-          </button>
-          <div class="rk-ctrl">
-            <button type="button" class="rk-icon rk-handle" aria-label="Drag to reorder ${label} (or use arrow keys)">${ICONS.grip}</button>
-            <button type="button" class="rk-icon" data-act="up" aria-label="Move ${label} up" ${i === 0 ? 'disabled' : ''}>${ICONS.up}</button>
-            <button type="button" class="rk-icon" data-act="down" aria-label="Move ${label} down" ${i === total - 1 ? 'disabled' : ''}>${ICONS.down}</button>
-            <button type="button" class="rk-icon rk-del" data-act="delete" aria-label="Delete ${label}">${ICONS.close}</button>
-          </div>
-        </div>
+        <button type="button" class="rk-thumb" data-act="zoom" aria-label="Enlarge photo of ${label}">
+          <img src="${escapeHtml(dish.image || '')}" alt="" loading="lazy" draggable="false">
+          <span class="rk-badge${medal}" aria-label="Rank ${rank}">${rank}</span>
+        </button>
         <div class="rk-fields">
           <label class="visually-hidden" for="rk-title-${escapeHtml(dish.id)}">Dish name</label>
           <input class="input rk-title" id="rk-title-${escapeHtml(dish.id)}" data-field="title" type="text"
             placeholder="What was it?" value="${escapeHtml(title)}" autocomplete="off" maxlength="120">
-          <label class="visually-hidden" for="rk-note-${escapeHtml(dish.id)}">Short note</label>
-          <input class="input rk-note" id="rk-note-${escapeHtml(dish.id)}" data-field="note" type="text"
-            placeholder="Tip: order the spicy version" value="${escapeHtml(dish.note || '')}" autocomplete="off" maxlength="200">
           ${placeHtml(dish)}
+        </div>
+        <div class="rk-ctrl">
+          <button type="button" class="rk-icon rk-handle" aria-label="Drag to reorder ${label} (or use arrow keys)">${ICONS.grip}</button>
+          <button type="button" class="rk-icon rk-move" data-act="up" aria-label="Move ${label} up" ${i === 0 ? 'disabled' : ''}>${ICONS.up}</button>
+          <button type="button" class="rk-icon rk-move" data-act="down" aria-label="Move ${label} down" ${i === total - 1 ? 'disabled' : ''}>${ICONS.down}</button>
+          <button type="button" class="rk-icon rk-del" data-act="delete" aria-label="Delete ${label}">${ICONS.close}</button>
         </div>
       </li>`;
   }
@@ -105,9 +100,6 @@ export function render(container) {
             ${p.mapsUrl ? `<a class="rk-chip-map" href="${escapeHtml(p.mapsUrl)}" target="_blank" rel="noopener">Map ↗</a>` : ''}
             <button type="button" class="rk-chip-x" data-act="clear-place" aria-label="Remove restaurant ${escapeHtml(p.name)}">${ICONS.close}</button>
           </div>
-          <label class="visually-hidden" for="rk-web-${id}">Restaurant website</label>
-          <input class="input rk-website" id="rk-web-${id}" data-field="website" type="url" inputmode="url"
-            placeholder="Website (optional)" value="${escapeHtml(p.website || '')}" autocomplete="off">
         </div>`;
     }
     return `
@@ -163,7 +155,7 @@ export function render(container) {
       const d = t.dishes.find((x) => x.id === id);
       if (d) d.place = place;
     });
-    renderList({ id, sel: place ? '.rk-website' : '.rk-search' });
+    renderList({ id, sel: place ? '.rk-chip-x' : '.rk-search' });
   }
 
   // ---------- restaurant search ----------
@@ -412,19 +404,7 @@ export function render(container) {
     const id = card.dataset.id;
     if (t.classList.contains('rk-search')) { onSearchInput(t, id); return; }
     const field = t.dataset.field;
-    if (field === 'title' || field === 'note') editDish(id, (d) => { d[field] = t.value; });
-    else if (field === 'website') editDish(id, (d) => { if (d.place) d.place.website = t.value.trim(); });
-  }
-
-  function onChange(e) {
-    // Normalise website on commit: add https:// if the scheme is missing.
-    const t = e.target;
-    if (t.dataset.field !== 'website') return;
-    const v = t.value.trim();
-    if (v && !/^[a-z][a-z0-9+.-]*:\/\//i.test(v)) {
-      t.value = 'https://' + v;
-      editDish(t.closest('.rk-card').dataset.id, (d) => { if (d.place) d.place.website = t.value; });
-    }
+    if (field === 'title') editDish(id, (d) => { d.title = t.value; });
   }
 
   function onClick(e) {
@@ -480,7 +460,6 @@ export function render(container) {
   }
 
   list.addEventListener('input', onInput);
-  list.addEventListener('change', onChange);
   list.addEventListener('click', onClick);
   list.addEventListener('keydown', onKeyDown);
   list.addEventListener('pointerdown', onPointerDown);

@@ -4,48 +4,45 @@
 
 .rk-list {
   list-style: none; margin: 0; padding: 0;
-  display: flex; flex-direction: column; gap: 12px;
+  display: flex; flex-direction: column; gap: 8px;
 }
 
+/* One compact row: photo | name + restaurant | controls */
 .rk-card {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-  padding: 12px;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
   min-width: 0;
 }
 
-.rk-top { display: flex; align-items: center; gap: 10px; min-width: 0; }
-
-.rk-badge {
-  flex: none;
-  display: inline-grid; place-items: center;
-  min-width: 40px; height: 40px; padding: 0 6px;
-  border-radius: 999px;
-  background: var(--surface-2); color: var(--text);
-  border: 1px solid var(--border);
-  font: 800 1rem var(--font-display);
-}
-.rk-badge--1 { background: var(--gold); border-color: var(--gold); color: var(--accent-ink); }
-.rk-badge--2 { background: var(--silver); border-color: var(--silver); color: var(--accent-ink); }
-.rk-badge--3 { background: var(--bronze); border-color: var(--bronze); color: var(--accent-ink); }
-
 .rk-thumb {
-  flex: none;
-  width: 96px; height: 96px; padding: 0;
+  position: relative;
+  width: 64px; height: 64px; padding: 0;
   border: 1px solid var(--border); border-radius: var(--radius-sm);
   background: var(--surface-2); overflow: hidden; cursor: zoom-in;
 }
 .rk-thumb img { width: 100%; height: 100%; object-fit: cover; -webkit-user-drag: none; }
 .rk-thumb:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-.rk-ctrl {
-  margin-left: auto;
-  display: grid; grid-template-columns: repeat(2, 40px); gap: 4px;
+.rk-badge {
+  position: absolute; top: 3px; left: 3px;
+  display: inline-grid; place-items: center;
+  min-width: 22px; height: 22px; padding: 0 5px;
+  border-radius: 999px;
+  background: var(--surface); color: var(--text);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .25);
+  font: 800 .75rem var(--font-display);
 }
+.rk-badge--1 { background: var(--gold); color: #fff; }
+.rk-badge--2 { background: var(--silver); color: #fff; }
+.rk-badge--3 { background: var(--bronze); color: #fff; }
+
+.rk-ctrl { display: grid; grid-template-columns: 32px; gap: 4px; }
 .rk-icon {
   display: inline-grid; place-items: center;
-  width: 40px; height: 40px; padding: 0;
+  width: 32px; height: 30px; padding: 0;
   border: 1px solid var(--border); border-radius: var(--radius-sm);
   background: var(--surface); color: var(--muted); cursor: pointer;
 }
@@ -55,8 +52,11 @@
 .rk-handle { cursor: grab; touch-action: none; color: var(--text); background: var(--surface-2); }
 .rk-handle:active { cursor: grabbing; }
 .rk-del:hover:not(:disabled) { color: var(--danger); border-color: var(--danger); }
+/* Phones drag; the up/down buttons only show on wider screens. */
+.rk-move { display: none; }
 
-.rk-fields { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.rk-fields { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.rk-fields .input { padding: 6px 10px; font-size: .95rem; }
 .rk-title { font-weight: 600; }
 
 /* Restaurant search */
@@ -79,25 +79,24 @@
 .rk-opt--typed { color: var(--accent); font-weight: 600; }
 .rk-dd-status { padding: 6px 10px; font-size: .85rem; }
 
-.rk-place { display: flex; flex-direction: column; gap: 8px; }
 .rk-chip {
-  display: flex; align-items: center; gap: 10px;
-  padding: 6px 6px 6px 12px;
+  display: flex; align-items: center; gap: 8px;
+  padding: 2px 2px 2px 10px; min-height: 34px;
   background: var(--accent-soft); border-radius: var(--radius-sm);
   min-width: 0;
 }
 .rk-chip-text { display: flex; flex-direction: column; min-width: 0; flex: 1; line-height: 1.3; }
 .rk-chip-text strong, .rk-chip-text span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.rk-chip-text span { font-size: .85rem; }
+.rk-chip-text strong { font-size: .9rem; }
+.rk-chip-text span { font-size: .75rem; }
 .rk-chip-map { flex: none; font-weight: 600; font-size: .9rem; text-decoration: none; white-space: nowrap; }
 .rk-chip-map:hover { text-decoration: underline; }
 .rk-chip-x {
   flex: none; display: inline-grid; place-items: center;
-  width: 32px; height: 32px; padding: 0;
+  width: 28px; height: 28px; padding: 0;
   border: 0; border-radius: 999px; background: transparent; color: var(--muted); cursor: pointer;
 }
 .rk-chip-x:hover { color: var(--text); background: var(--surface); }
-.rk-website { font-size: .9rem; padding: 8px 12px; }
 
 /* Dragging */
 .rk-dragging {
@@ -127,16 +126,12 @@
   border: 0; border-radius: 999px; background: var(--surface); color: var(--text); cursor: pointer;
 }
 
-/* Wider screens: media | fields | controls */
+/* Wider screens: bigger photo, show up/down buttons */
 @media (min-width: 640px) {
-  .rk-card { grid-template-columns: auto minmax(0, 1fr) auto; align-items: start; }
-  .rk-top { display: contents; }
-  .rk-top > .rk-badge, .rk-top > .rk-thumb { grid-row: 1; }
-  .rk-card > .rk-top > .rk-badge { grid-column: 1; align-self: start; margin: 6px 0 0 6px; position: relative; z-index: 1; }
-  .rk-card > .rk-top > .rk-thumb { grid-column: 1; width: 112px; height: 112px; }
-  .rk-card > .rk-top > .rk-ctrl { grid-column: 3; grid-row: 1; margin-left: 0; grid-template-columns: 40px; }
-  .rk-fields { grid-column: 2; grid-row: 1; }
-  .rk-card > .rk-top > .rk-badge { justify-self: start; }
+  .rk-card { grid-template-columns: 88px minmax(0, 1fr) auto; gap: 14px; padding: 10px; }
+  .rk-thumb { width: 88px; height: 88px; }
+  .rk-ctrl { grid-template-columns: repeat(2, 32px); }
+  .rk-move { display: inline-grid; }
 }
 
 @media (prefers-reduced-motion: no-preference) {

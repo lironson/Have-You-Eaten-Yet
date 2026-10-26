@@ -147,7 +147,7 @@
 }
 @media (min-width: 720px) { .sm-list { grid-template-columns: 1fr 1fr; } }
 .sm-item {
-  display: grid; grid-template-columns: 64px 28px 1fr; align-items: start; gap: 12px;
+  display: grid; grid-template-columns: 64px 2.6rem 1fr; align-items: start; gap: 12px;
   padding: 14px 0; border-bottom: 1px dotted var(--border);
   break-inside: avoid;
 }
@@ -158,6 +158,7 @@
 .sm-thumb.sm-img-empty { font-size: 1.5rem; }
 .sm-item-rank {
   font: 800 1.5rem/1 var(--font-display); color: var(--muted);
+  font-variant-numeric: tabular-nums; white-space: nowrap;
   padding-top: 2px; text-align: right;
 }
 .sm-item-body { min-width: 0; }
@@ -234,7 +235,7 @@
   /* The rest starts on a fresh page */
   .sm-rest { break-before: page; page-break-before: always; }
   .sm-list { grid-template-columns: 1fr 1fr; gap: 0 20px; }
-  .sm-item { break-inside: avoid; page-break-inside: avoid; padding: 8px 0; grid-template-columns: 52px 22px 1fr; gap: 8px; }
+  .sm-item { break-inside: avoid; page-break-inside: avoid; padding: 8px 0; grid-template-columns: 52px 30px 1fr; gap: 8px; }
   .sm-thumb { width: 52px; height: 52px; }
   .sm-item-rank { font-size: 15pt; }
   .sm-item-title { font-size: 11.5pt; }

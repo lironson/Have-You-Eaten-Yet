@@ -137,3 +137,12 @@
 @media (prefers-reduced-motion: no-preference) {
   .rk-dragging { transition: transform .12s ease, box-shadow .12s ease; }
 }
+
+/* "Can't decide?" tournament link */
+.rk-cta { margin: 6px 0 0; font-size: .95rem; }
+.rk-cta-btn {
+  padding: 0; border: 0; background: none; cursor: pointer;
+  color: var(--accent); font-family: var(--font-body); font-size: inherit; font-weight: 600;
+  text-decoration: underline; text-underline-offset: 3px;
+}
+.rk-cta-btn:hover { text-decoration-thickness: 2px; }

@@ -2,6 +2,7 @@
 // Text edits update state without re-rendering (keeps focus); the list is
 // only re-rendered on reorder, delete, or place change.
 import { getTrip, updateTrip, mapsSearchUrl, escapeHtml } from './state.js';
+import { openBracket } from './bracket.js';
 
 const NOMINATIM = 'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&q=';
 const SEARCH_DEBOUNCE = 400;
@@ -20,6 +21,7 @@ export function render(container) {
       <header class="rk-head">
         <h1>Rank your bites</h1>
         <p class="muted">Drag to reorder. #1 is the best thing you ate.</p>
+        <p class="rk-cta" hidden>Can't decide? <button type="button" class="rk-cta-btn" data-rk-bracket>Start a tournament bracket →</button></p>
       </header>
       <ol class="rk-list" aria-label="Ranked dishes"></ol>
       <p class="visually-hidden" aria-live="polite" data-rk-live></p>
@@ -31,12 +33,14 @@ export function render(container) {
 
   const list = container.querySelector('.rk-list');
   const live = container.querySelector('[data-rk-live]');
+  const cta = container.querySelector('.rk-cta');
   const searchCache = new Map();
   const searchTimers = new Map(); // dish id -> timeout
   let searchAbort = null;
   let saveTimer = null;
   let drag = null;
   let lightbox = null;
+  let closeBracket = null;
 
   const dishById = (id) => getTrip().dishes.find((d) => d.id === id);
   const announce = (msg) => { live.textContent = msg; };
@@ -115,11 +119,26 @@ export function render(container) {
   function renderList(focus) {
     const { dishes } = getTrip();
     list.innerHTML = dishes.map((d, i) => cardHtml(d, i, dishes.length)).join('');
+    cta.hidden = dishes.length < 3;
     if (focus) {
       const el = list.querySelector(`.rk-card[data-id="${CSS.escape(focus.id)}"] ${focus.sel}`);
       if (el && !el.disabled) el.focus();
       else list.querySelector(`.rk-card[data-id="${CSS.escape(focus.id)}"] .rk-handle`)?.focus();
     }
+  }
+
+  // ---------- tournament ----------
+  function startBracket() {
+    flushSave();
+    closeBracket = openBracket(getTrip().dishes, (order) => {
+      closeBracket = null;
+      updateTrip((t) => {
+        const byId = new Map(t.dishes.map((d) => [d.id, d]));
+        t.dishes = order.map((id) => byId.get(id)).filter(Boolean);
+      });
+      renderList();
+      announce('Ranking updated from your tournament.');
+    });
   }
 
   // ---------- reorder / delete ----------
@@ -468,6 +487,7 @@ export function render(container) {
   list.addEventListener('pointercancel', endDrag);
   list.addEventListener('lostpointercapture', endDrag);
   list.addEventListener('focusin', onFocusIn);
+  cta.querySelector('[data-rk-bracket]').addEventListener('click', startBracket);
   // Prevent native image/link drag ghosts interfering with pointer drag.
   list.addEventListener('dragstart', (e) => e.preventDefault());
   document.addEventListener('pointerdown', onDocPointerDown);
@@ -480,6 +500,7 @@ export function render(container) {
     searchTimers.forEach((t) => clearTimeout(t));
     if (searchAbort) searchAbort.abort();
     closeLightbox();
+    if (closeBracket) closeBracket();
     document.body.classList.remove('rk-no-select');
     document.removeEventListener('pointerdown', onDocPointerDown);
   };

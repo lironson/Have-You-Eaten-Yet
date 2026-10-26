@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Have You Eaten Yet?</title>
+  <meta name="description" content="Turn your trip's food photos into a ranked, shareable guide.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/upload.css">
+  <link rel="stylesheet" href="css/rank.css">
+  <link rel="stylesheet" href="css/summary.css">
+</head>
+<body>
+  <header class="site-header no-print">
+    <a class="brand" href="#upload">Have You Eaten Yet?</a>
+    <nav class="steps" aria-label="Progress">
+      <a href="#upload" data-step="upload"><span>1</span> Upload</a>
+      <a href="#rank" data-step="rank"><span>2</span> Rank</a>
+      <a href="#summary" data-step="summary"><span>3</span> Share</a>
+    </nav>
+  </header>
+
+  <main id="app"></main>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

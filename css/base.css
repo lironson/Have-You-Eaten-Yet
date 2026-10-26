@@ -1,0 +1,112 @@
+/* Shared design tokens and primitives. Screen styles live in their own files. */
+:root {
+  --bg: #fbf6ef;
+  --surface: #ffffff;
+  --surface-2: #f3ebdf;
+  --text: #2a211b;
+  --muted: #7a6a5c;
+  --border: #e6dccd;
+  --accent: #d9480f;        /* chili */
+  --accent-ink: #ffffff;
+  --accent-soft: #fde8dc;
+  --gold: #e8a317;
+  --silver: #9aa3ad;
+  --bronze: #b8733d;
+  --danger: #c92a2a;
+  --radius: 14px;
+  --radius-sm: 8px;
+  --shadow: 0 1px 2px rgba(42, 33, 27, .06), 0 4px 16px rgba(42, 33, 27, .06);
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "Inter", system-ui, -apple-system, sans-serif;
+  --gutter: 16px;
+  --max: 960px;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1b1612;
+    --surface: #251f1a;
+    --surface-2: #2f2721;
+    --text: #f3ece4;
+    --muted: #b3a393;
+    --border: #3d332b;
+    --accent: #ff7a3d;
+    --accent-ink: #1b1612;
+    --accent-soft: #3a2519;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 4px 16px rgba(0, 0, 0, .25);
+    color-scheme: dark;
+  }
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.5 var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+img { max-width: 100%; display: block; }
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.15; margin: 0 0 .5em; }
+h1 { font-size: clamp(2rem, 5vw, 3rem); font-weight: 800; }
+h2 { font-size: 1.5rem; font-weight: 600; }
+a { color: var(--accent); }
+
+.site-header {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px var(--gutter);
+  max-width: var(--max); margin: 0 auto;
+}
+.brand {
+  font-family: var(--font-display); font-weight: 800; font-size: 1.15rem;
+  color: var(--text); text-decoration: none;
+}
+.steps { display: flex; gap: 4px; }
+.steps a {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 10px; border-radius: 999px;
+  color: var(--muted); text-decoration: none; font-size: .9rem; font-weight: 500;
+}
+.steps a span {
+  display: inline-grid; place-items: center; width: 20px; height: 20px;
+  border-radius: 50%; background: var(--surface-2); font-size: .75rem;
+}
+.steps a.active { color: var(--text); background: var(--surface); box-shadow: var(--shadow); }
+.steps a.active span { background: var(--accent); color: var(--accent-ink); }
+.steps a.disabled { pointer-events: none; opacity: .45; }
+
+#app { max-width: var(--max); margin: 0 auto; padding: 8px var(--gutter) 64px; }
+
+/* Primitives shared by all screens */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 10px 18px; border-radius: 999px; border: 1px solid var(--border);
+  background: var(--surface); color: var(--text);
+  font: 600 .95rem var(--font-body); cursor: pointer; text-decoration: none;
+}
+.btn:hover { border-color: var(--muted); }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn-primary:hover { filter: brightness(1.05); border-color: var(--accent); }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.btn-ghost { background: transparent; border-color: transparent; }
+
+.input {
+  width: 100%; padding: 10px 12px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  font: inherit;
+}
+.input:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
+
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+.muted { color: var(--muted); }
+.actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; margin-top: 24px; }
+.visually-hidden { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: #fff; color: #000; }
+  #app { max-width: none; padding: 0; }
+}

@@ -8,7 +8,7 @@ const FONT_LINKS = `<link rel="preconnect" href="https://fonts.googleapis.com">
 const MEDALS = ['gold', 'silver', 'bronze'];
 
 // Public home of the app, linked from the guide's footer (screen, PDF, download).
-const SITE_URL = 'https://lironson.github.io/Have-You-Eaten-Yet-/';
+const SITE_URL = 'https://lironson.github.io/Have-You-Eaten-Yet/';
 
 function tripName(trip) {
   return (trip.name || '').trim() || 'My Food Trip';

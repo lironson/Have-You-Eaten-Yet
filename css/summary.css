@@ -210,51 +210,42 @@
     background: #fff;
   }
   .sm-guide, .sm-guide * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .sm-head { padding-bottom: 10px; margin-bottom: 14px; }
-  .sm-eyebrow { margin-bottom: 6px; }
-  .sm-title { font-size: 30pt; margin-bottom: 4px; }
-  .sm-subtitle { font-size: 13pt; margin-bottom: 4px; }
-  .sm-section-title { margin-bottom: 10px; }
+  .sm-head { padding-bottom: 3mm; margin-bottom: 4mm; }
+  .sm-eyebrow { margin-bottom: 1.5mm; font-size: 7.5pt; }
+  .sm-title { font-size: 24pt; margin-bottom: 1mm; }
+  .sm-subtitle { font-size: 11pt; margin-bottom: 1mm; }
+  .sm-meta { font-size: 9pt; }
+  .sm-section-title { margin-bottom: 3mm; break-after: avoid; page-break-after: avoid; }
 
-  /* Page one = header + Top 3 in a fixed-height box (Letter, the shorter
-     paper, minus @page margins). Photos flex to fill whatever the text
-     leaves, and text is clamped, so nothing can spill onto page two. */
-  .sm-page1 {
-    display: flex; flex-direction: column;
-    height: 250mm; overflow: hidden;
-    break-after: page; page-break-after: always;
-  }
-  .sm-head { flex: none; }
-  .sm-top { flex: 1; min-height: 0; display: flex; flex-direction: column; }
-  .sm-top .sm-section-title { flex: none; }
-  .sm-podium {
-    flex: 1; min-height: 0; margin-bottom: 0;
-    grid-template-columns: 1fr 1fr; grid-template-rows: minmax(0, 1.15fr) minmax(0, 1fr); gap: 10px;
-  }
-  .sm-podium-1 { grid-template-rows: minmax(0, 1fr); }
-  .sm-podium-2 { grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); }
+  /* Compact page one: every Top 3 card is a fixed-size row (photo left,
+     text right) with clamped text, so page one is ~140mm tall whatever the
+     content, paper, margins or browser headers. Nothing is forced onto page
+     two; the map and the rest flow after, never split. */
+  .sm-podium { grid-template-columns: 1fr 1fr; gap: 3mm; margin: 0 0 6mm; }
+  .sm-podium-1 { grid-template-columns: 1fr; }
   .sm-feature-1, .sm-podium-2 .sm-feature-2 { grid-column: 1 / -1; }
-  .sm-feature {
-    min-height: 0; overflow: hidden;
+  .sm-feature, .sm-feature-1 {
+    flex-direction: row; height: 1.45in; overflow: hidden;
     break-inside: avoid; page-break-inside: avoid; border: 1px solid var(--border);
   }
-  .sm-feature-media { flex: 1 1 auto; min-height: 0; }
+  .sm-feature-1 { height: 2.1in; }
+  .sm-feature-media, .sm-feature-1 .sm-feature-media { flex: 0 0 1.45in; width: 1.45in; height: 100%; }
+  .sm-feature-1 .sm-feature-media { flex-basis: 2.6in; width: 2.6in; }
   .sm-feature-img, .sm-feature-1 .sm-feature-img { width: 100%; height: 100%; min-height: 0; aspect-ratio: auto; }
-  .sm-feature-body { flex: none; padding: 8px 12px 10px; }
-  .sm-feature-1 { flex-direction: row; }
-  .sm-feature-1 .sm-feature-media { flex: 0 0 55%; }
-  .sm-feature-1 .sm-feature-body { flex: 1; min-width: 0; align-self: center; padding: 14px 16px; }
-  .sm-dish-title { font-size: 14pt; }
-  .sm-feature-1 .sm-dish-title { font-size: 20pt; }
+  .sm-feature-body, .sm-feature-1 .sm-feature-body { flex: 1; min-width: 0; align-self: center; padding: 2mm 3mm; }
+  .sm-dish-title { font-size: 11.5pt; margin-bottom: 1mm; }
+  .sm-feature-1 .sm-dish-title { font-size: 17pt; }
   .sm-dish-title, .sm-note {
     display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
   }
-  .sm-feature-1 .sm-dish-title, .sm-feature-1 .sm-note { -webkit-line-clamp: 3; }
-  .sm-place { margin-bottom: 4px; }
+  .sm-feature-1 .sm-note { -webkit-line-clamp: 3; font-size: 10pt; }
+  .sm-place { font-size: 9pt; margin-bottom: 1mm; }
   .sm-place-name, .sm-address { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .sm-note { font-size: 10.5pt; margin-bottom: 4px; }
-  .sm-medal { width: 36px; height: 36px; font-size: 15pt; top: 8px; left: 8px; }
-  .sm-feature-1 .sm-medal { width: 44px; height: 44px; font-size: 18pt; }
+  .sm-address { font-size: 8pt; }
+  .sm-note { font-size: 9pt; line-height: 1.3; margin-bottom: 1mm; }
+  .sm-links { gap: 8px; }
+  .sm-medal { width: 24px; height: 24px; font-size: 11pt; top: 5px; left: 5px; }
+  .sm-feature-1 .sm-medal { width: 34px; height: 34px; font-size: 15pt; top: 7px; left: 7px; }
 
   .sm-list { grid-template-columns: 1fr 1fr; gap: 0 20px; }
   .sm-item { break-inside: avoid; page-break-inside: avoid; padding: 8px 0; grid-template-columns: 52px 30px 1fr; gap: 8px; }

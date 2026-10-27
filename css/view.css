@@ -23,4 +23,7 @@
 
 @media print {
   .vw-bar { display: none; }
+  /* Let the compact print photo boxes size the placeholders too. */
+  .sm-guide--shared .sm-feature-img.sm-img-empty,
+  .sm-guide--shared .sm-feature-1 .sm-feature-img.sm-img-empty { aspect-ratio: auto; min-height: 0; height: 100%; font-size: 1.4rem; }
 }

@@ -9,7 +9,7 @@ Turn your trip's food photos into a ranked, shareable guide for friends visiting
    bracket that picks your top 4. Add a dish title and tag the restaurant
    via a quick search (OpenStreetMap, no API key) that links to Google Maps.
 3. **Share** – a printable guide with an interactive **map** of the restaurants (Leaflet +
-   OpenStreetMap): print / save as PDF (a compact layout: the Top 3 fit page one on any paper or margin setting), share the text list, or
+   OpenStreetMap): print / save as PDF (a compact layout: the Top 3 fit page one on any paper or margin setting), or
    download a single self-contained HTML file with every photo inside and a working map.
    **Share map** packs the guide's text, restaurants and map pins (no photos) into a link to the
    live site (`#view=<data>`, deflate-compressed, base64url). It opens read-only on any phone,

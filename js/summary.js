@@ -159,19 +159,6 @@ export function guideHtml(trip, { live = true, shared = false } = {}) {
   </article>`;
 }
 
-export function plainText(trip) {
-  const lines = [`${tripName(trip)} — my food rankings`];
-  (trip.dishes || []).forEach((d, i) => {
-    let line = `${i + 1}. ${dishTitle(d)}`;
-    if (d.place && d.place.name) line += ` @ ${d.place.name}`;
-    const maps = mapsUrlFor(d);
-    if (maps) line += ` — ${maps}`;
-    lines.push(line);
-  });
-  lines.push('', `Made with Have You Eaten Yet? ${SITE_URL}`);
-  return lines.join('\n');
-}
-
 async function copyText(text) {
   try {
     await navigator.clipboard.writeText(text);
@@ -257,7 +244,6 @@ export function render(container) {
       <div class="sm-toolbar-actions">
         <button type="button" class="btn" data-act="print">Print / Save PDF</button>
         <button type="button" class="btn" data-act="share-link">Share map</button>
-        <button type="button" class="btn" data-act="share">Share text</button>
         <button type="button" class="btn btn-primary" data-act="download" title="A single HTML file with all photos inside. Best way to send the guide to friends.">Download page</button>
       </div>
       <p class="sm-toolbar-hint muted">Tip: <strong>Share map</strong> sends a link to the map and ranked list that opens on any phone (no photos). <strong>Download page</strong> saves one file with every photo inside.</p>
@@ -272,20 +258,6 @@ export function render(container) {
     toast.classList.add('sm-toast-show');
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => toast.classList.remove('sm-toast-show'), 2000);
-  }
-
-  async function share() {
-    const text = plainText(trip);
-    const title = `${tripName(trip)} — my food rankings`;
-    if (navigator.share) {
-      try {
-        await navigator.share({ title, text });
-        return;
-      } catch (err) {
-        if (err && err.name === 'AbortError') return;
-      }
-    }
-    showToast((await copyText(text)) ? 'Copied!' : 'Could not copy');
   }
 
   async function shareLink(btn) {
@@ -332,7 +304,6 @@ export function render(container) {
     if (!btn) return;
     const act = btn.dataset.act;
     if (act === 'print') window.print();
-    else if (act === 'share') share();
     else if (act === 'share-link') shareLink(btn);
     else if (act === 'download') download(btn);
   }

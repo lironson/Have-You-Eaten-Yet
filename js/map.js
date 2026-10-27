@@ -17,11 +17,12 @@ const hasCoords = (p) => !!p && Number.isFinite(p.lat) && Number.isFinite(p.lon)
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // `live`: the summary screen, where missing pins may still be looked up.
-// The downloaded page only gets a map if it has pins to show.
-export function mapSectionHtml(trip, live = true) {
+// The downloaded page and shared links (`readOnly`) only get a map if it
+// has pins to show.
+export function mapSectionHtml(trip, live = true, readOnly = false) {
   const tagged = trip.dishes.some((d) => d.place && d.place.name);
   if (!tagged || (!live && !trip.dishes.some((d) => hasCoords(d.place)))) return '';
-  const note = missingNote(trip);
+  const note = missingNote(trip, readOnly);
   return `<section class="mp" aria-labelledby="mp-h">
     <h2 class="sm-section-title" id="mp-h"><span>Where to eat</span></h2>
     <div class="mp-map" role="region" aria-label="Map of the restaurants"></div>
@@ -47,8 +48,10 @@ export function pinData(trip, urlFor, withImages = false) {
   return pins;
 }
 
-export function missingNote(trip) {
-  const names = trip.dishes.filter((d) => d.place && d.place.geo === 'none').map((d) => d.place.name);
+// Read-only guides can't look places up, so anything without a pin counts.
+export function missingNote(trip, readOnly = false) {
+  const missing = (p) => (readOnly ? !hasCoords(p) : p.geo === 'none');
+  const names = trip.dishes.filter((d) => d.place && d.place.name && missing(d.place)).map((d) => d.place.name);
   return names.length ? `Not on map: ${names.join(', ')} (no location found)` : '';
 }
 
@@ -95,8 +98,9 @@ export const LEAFLET_JS = 'vendor/leaflet/leaflet.js';
 export const LEAFLET_CSS = 'vendor/leaflet/leaflet.css';
 export { TILES };
 
-// Live map on the summary screen. Returns a cleanup function.
-export function mountMap(container, trip, urlFor) {
+// Live map. `readOnly` (a shared link): never looks places up or saves
+// anything. Returns a cleanup function.
+export function mountMap(container, trip, urlFor, { readOnly = false } = {}) {
   const section = container.querySelector('.mp');
   if (!section) return () => {};
   const el = section.querySelector('.mp-map');
@@ -106,7 +110,7 @@ export function mountMap(container, trip, urlFor) {
 
   const refresh = () => {
     if (ctl) ctl.set(pinData(trip, urlFor, true));
-    const note = missingNote(trip);
+    const note = missingNote(trip, readOnly);
     missingEl.textContent = note;
     missingEl.hidden = !note;
   };
@@ -129,7 +133,7 @@ export function mountMap(container, trip, urlFor) {
     ctl = drawMap(window.L, el, pinData(trip, urlFor, true), TILES);
     measure();
     refresh();
-    geocodeMissing();
+    if (!readOnly) geocodeMissing();
   }).catch(() => {
     el.innerHTML = '<p class="mp-fallback muted">The map couldn\'t load. Check your connection.</p>';
   });

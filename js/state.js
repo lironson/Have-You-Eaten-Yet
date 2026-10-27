@@ -92,6 +92,14 @@ export function mapsSearchUrl(query) {
   return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query);
 }
 
+// Public home of the app: footer links and shared guide links point here.
+export const SITE_URL = 'https://lironson.github.io/Have-You-Eaten-Yet/';
+
+// Only allow http(s) links in guides.
+export function safeUrl(url) {
+  return /^https?:\/\//i.test(url || '') ? url : '';
+}
+
 export function escapeHtml(s = '') {
   return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }

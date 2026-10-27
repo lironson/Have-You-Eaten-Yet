@@ -5,19 +5,22 @@ import * as upload from './upload.js';
 import * as rank from './rank.js';
 import * as summary from './summary.js';
 import * as join from './join.js';
+import * as view from './view.js';
 
-const screens = { upload, rank, summary, join };
+const screens = { upload, rank, summary, join, view };
+// Guest screens: someone else's invite or shared guide. No step nav, no trip needed.
+const GUEST = new Set(['join', 'view']);
 const app = document.getElementById('app');
 let cleanup = null;
 
-// "#join=<id>" is a friend sending photos; the route name is before the "=".
+// "#join=<id>" / "#view=<data>": the route name is before the "=".
 const hashRoute = () => location.hash.slice(1).split('=')[0];
 
 function currentRoute() {
   const name = hashRoute();
   if (!screens[name]) return 'upload';
   // Rank and summary need photos first.
-  if (name !== 'upload' && name !== 'join' && getTrip().dishes.length === 0) return 'upload';
+  if (name !== 'upload' && !GUEST.has(name) && getTrip().dishes.length === 0) return 'upload';
   return name;
 }
 
@@ -32,7 +35,7 @@ function updateNav(route) {
 function show() {
   const route = currentRoute();
   if (hashRoute() !== route) history.replaceState(null, '', '#' + route);
-  document.body.classList.toggle('route-join', route === 'join');
+  document.body.classList.toggle('route-guest', GUEST.has(route));
   if (typeof cleanup === 'function') cleanup();
   app.innerHTML = '';
   cleanup = screens[route].render(app);

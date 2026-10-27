@@ -1,5 +1,6 @@
 // Screen 3: the shareable / printable food guide.
-import { getTrip, escapeHtml, mapsSearchUrl } from './state.js';
+import { getTrip, escapeHtml, mapsSearchUrl, SITE_URL, safeUrl } from './state.js';
+import { shareUrl, canShareLinks } from './share.js';
 import { mapSectionHtml, mountMap, standaloneMapScript, LEAFLET_CSS } from './map.js';
 
 const FONT_LINKS = `<link rel="preconnect" href="https://fonts.googleapis.com">
@@ -8,8 +9,6 @@ const FONT_LINKS = `<link rel="preconnect" href="https://fonts.googleapis.com">
 
 const MEDALS = ['gold', 'silver', 'bronze'];
 
-// Public home of the app, linked from the guide's footer (screen, PDF, download).
-const SITE_URL = 'https://lironson.github.io/Have-You-Eaten-Yet/';
 
 function tripName(trip) {
   return (trip.name || '').trim() || 'My Food Trip';
@@ -27,20 +26,18 @@ function mapsUrlFor(dish) {
   return q ? mapsSearchUrl(q) : '';
 }
 
-function safeUrl(url) {
-  // Only allow http(s) links in the guide.
-  return /^https?:\/\//i.test(url || '') ? url : '';
-}
-
-const pinUrl = (dish) => safeUrl(mapsUrlFor(dish));
+export const pinUrl = (dish) => safeUrl(mapsUrlFor(dish));
 
 function slugify(s) {
   return s.toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '')
     .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'my-food-trip';
 }
 
-function todayLabel() {
-  return new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+// `iso` ("2026-10-26", from a shared link) or today.
+function dateLabel(iso) {
+  const [y, m, d] = (iso || '').split('-').map(Number);
+  const date = y ? new Date(y, m - 1, d) : new Date();
+  return date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
 function linksHtml(dish) {
@@ -95,8 +92,9 @@ function restItem(dish, i) {
   </li>`;
 }
 
-// `live` is the on-screen guide; false for the downloaded page.
-function guideHtml(trip, live = true) {
+// `live`: the on-screen summary (false for the downloaded page or a shared
+// link). `shared`: rendered from a #view link, so there are no photos.
+export function guideHtml(trip, { live = true, shared = false } = {}) {
   const dishes = trip.dishes || [];
   const top = dishes.slice(0, 3);
   const rest = dishes.slice(3);
@@ -104,13 +102,13 @@ function guideHtml(trip, live = true) {
   const subtitle = n === 1 ? 'My top bite — eat this if you visit.' : `My top ${n} bites — eat these if you visit.`;
   const author = (trip.author || '').trim();
 
-  return `<article class="sm-guide">
+  return `<article class="sm-guide${shared ? ' sm-guide--shared' : ''}">
     <div class="sm-page1">
     <header class="sm-head">
       <p class="sm-eyebrow">Have You Eaten Yet?</p>
       <h1 class="sm-title">${escapeHtml(tripName(trip))}</h1>
       <p class="sm-subtitle">${escapeHtml(subtitle)}</p>
-      <p class="sm-meta">${author ? `<span>by ${escapeHtml(author)}</span><span class="sm-dot" aria-hidden="true">·</span>` : ''}<span>${escapeHtml(todayLabel())}</span></p>
+      <p class="sm-meta">${author ? `<span>by ${escapeHtml(author)}</span><span class="sm-dot" aria-hidden="true">·</span>` : ''}<span>${escapeHtml(dateLabel(trip.date))}</span></p>
     </header>
 
     ${top.length ? `<section class="sm-top" aria-labelledby="sm-top-h">
@@ -119,7 +117,7 @@ function guideHtml(trip, live = true) {
     </section>` : ''}
     </div>
 
-    ${mapSectionHtml(trip, live)}
+    ${mapSectionHtml(trip, live, shared)}
 
     ${rest.length ? `<section class="sm-rest" aria-labelledby="sm-rest-h">
       <h2 class="sm-section-title" id="sm-rest-h"><span>The rest</span></h2>
@@ -199,7 +197,7 @@ ${map}
 </head>
 <body class="sm-standalone">
 <main id="app">
-${guideHtml(trip, false)}
+${guideHtml(trip, { live: false })}
 </main>
 ${mapScript}
 </body>
@@ -227,10 +225,11 @@ export function render(container) {
       <a class="btn btn-ghost sm-back" href="#rank">← Edit rankings</a>
       <div class="sm-toolbar-actions">
         <button type="button" class="btn" data-act="print">Print / Save PDF</button>
-        <button type="button" class="btn" data-act="share">Share</button>
+        <button type="button" class="btn" data-act="share-link">Share link</button>
+        <button type="button" class="btn" data-act="share">Share text</button>
         <button type="button" class="btn btn-primary" data-act="download" title="A single HTML file with all photos inside. Best way to send the guide to friends.">Download page</button>
       </div>
-      <p class="sm-toolbar-hint muted">Tip: <strong>Download page</strong> saves one file with every photo inside. Send it to friends; it opens in any browser.</p>
+      <p class="sm-toolbar-hint muted">Tip: <strong>Share link</strong> opens the guide and map on any phone (no photos). <strong>Download page</strong> saves one file with every photo inside.</p>
     </div>
     ${guideHtml(trip)}
     <div class="sm-toast no-print" role="status" aria-live="polite"></div>
@@ -258,6 +257,31 @@ export function render(container) {
     showToast((await copyText(text)) ? 'Copied!' : 'Could not copy');
   }
 
+  async function shareLink(btn) {
+    if (!canShareLinks()) { showToast("Your browser can't make share links"); return; }
+    btn.disabled = true;
+    try {
+      const url = await shareUrl(trip);
+      const long = url.length > 8000;
+      if (navigator.share) {
+        if (long) showToast("It's a long link, so some apps may cut it off");
+        try {
+          await navigator.share({ title: `${tripName(trip)} — food guide`, url });
+          return;
+        } catch (err) {
+          if (err && err.name === 'AbortError') return;
+        }
+      }
+      const ok = await copyText(url);
+      showToast(!ok ? 'Could not copy' : long ? "Copied! It's long, so some apps may cut it off" : 'Copied!');
+    } catch (err) {
+      console.warn('Share link failed', err);
+      showToast('Could not make a link');
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
   async function download(btn) {
     btn.disabled = true;
     try {
@@ -278,6 +302,7 @@ export function render(container) {
     const act = btn.dataset.act;
     if (act === 'print') window.print();
     else if (act === 'share') share();
+    else if (act === 'share-link') shareLink(btn);
     else if (act === 'download') download(btn);
   }
 

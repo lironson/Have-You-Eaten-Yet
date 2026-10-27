@@ -37,7 +37,7 @@
 }
 
 /* Guest screen */
-.route-join .steps { display: none; }
+.route-guest .steps { display: none; }
 .iv-join { max-width: 480px; margin: 16px auto 0; text-align: center; }
 .iv-eyebrow {
   margin: 0 0 8px; color: var(--accent);

@@ -11,10 +11,11 @@ Turn your trip's food photos into a ranked, shareable guide for friends visiting
 3. **Share** – a printable guide with an interactive **map** of the restaurants (Leaflet +
    OpenStreetMap): print / save as PDF (a compact layout: the Top 3 fit page one on any paper or margin setting), share the text list, or
    download a single self-contained HTML file with every photo inside and a working map.
-   **Share link** packs the guide's text, restaurants and map pins (no photos) into a link to the
-   live site (`#view=<data>`, deflate-compressed, base64url). It opens read-only with the interactive
-   map on any phone, iPhone included, and the data never reaches a server. Use this to send the
-   guide by iMessage; iOS previews downloaded `.html` files without running JavaScript.
+   **Share map** packs the guide's text, restaurants and map pins (no photos) into a link to the
+   live site (`#view=<data>`, deflate-compressed, base64url). It opens read-only on any phone,
+   iPhone included, as the interactive map plus one compact ranked list, and the data never reaches
+   a server. Use this to send the guide by iMessage; iOS previews downloaded `.html` files without
+   running JavaScript.
 
 Everything stays in your browser (IndexedDB); nothing is uploaded to a server.
 
@@ -43,7 +44,7 @@ PeerServer, add `?peerserver=127.0.0.1:9000` to the URL.
 | `js/bracket.js`, `css/bracket.css` | "Can't decide?" tournament bracket overlay |
 | `js/summary.js`, `css/summary.css` | Printable summary |
 | `js/share.js` | Packs a guide into / out of a `#view=` link (short keys, deflate-raw, base64url) |
-| `js/view.js`, `css/view.css` | Read-only guide opened from a share link; never touches the viewer's own trip |
+| `js/view.js`, `css/view.css` | Read-only map + ranked list opened from a Share map link; never touches the viewer's own trip |
 | `js/map.js`, `css/map.css` | "Where to eat" map; looks up missing restaurant locations once |
 | `js/load.js` | Lazy loader for vendored libraries |
 | `js/invite.js`, `js/join.js`, `js/peer.js`, `css/invite.css` | Friends QR: host panel, guest screen (`#join=<id>`), shared helpers |

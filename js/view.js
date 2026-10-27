@@ -1,5 +1,5 @@
-// Read-only guide opened from a "Share link" (#view=<data>). Renders the
-// same guide and map as the summary from the link alone. It never reads
+// Read-only guide opened from a "Share map" link (#view=<data>): the map
+// and a compact ranked list, built from the link alone. It never reads
 // or writes the viewer's own trip, and never looks anything up.
 import { decodeGuide } from './share.js';
 import { guideHtml, pinUrl } from './summary.js';

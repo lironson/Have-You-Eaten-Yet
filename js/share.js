@@ -1,4 +1,4 @@
-// "Share link": the guide's text (no photos) packed into a URL hash,
+// "Share map": the guide's text (no photos) packed into a URL hash,
 // #view=<data>, so any phone can open it on the live site with a working
 // map and nothing ever reaches a server. Data is short-keyed JSON,
 // deflate-raw compressed, base64url encoded.

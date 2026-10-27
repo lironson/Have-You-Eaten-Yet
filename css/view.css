@@ -4,17 +4,32 @@
 .vw-make { font-weight: 600; font-size: .95rem; text-decoration: none; }
 .vw-make:hover { text-decoration: underline; }
 
-/* Shared links carry no photos: compact, warm placeholders instead. */
-.sm-guide--shared .sm-feature-img.sm-img-empty,
-.sm-guide--shared .sm-thumb.sm-img-empty {
-  background: linear-gradient(135deg, var(--accent-soft), var(--surface-2));
-  color: var(--accent); opacity: .9;
+/* Shared maps carry no photos: the map leads, then one compact list. */
+.sm-guide--shared .mp { margin-bottom: 24px; }
+.sm-textlist { list-style: none; margin: 0 0 24px; padding: 0; }
+@media (min-width: 720px) { .sm-textlist { display: grid; grid-template-columns: 1fr 1fr; gap: 0 28px; } }
+.sm-text-item {
+  display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 12px; align-items: start;
+  padding: 10px 0; border-bottom: 1px dotted var(--border);
+  break-inside: avoid; page-break-inside: avoid;
 }
-.sm-guide--shared .sm-feature-img.sm-img-empty { aspect-ratio: 5 / 2; font-size: 2rem; }
-.sm-guide--shared .sm-thumb.sm-img-empty { font-size: 1.2rem; }
-@media (min-width: 640px) {
-  .sm-guide--shared .sm-feature-1 .sm-feature-img.sm-img-empty { min-height: 220px; }
+.sm-text-rank {
+  display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%;
+  background: var(--surface-2); border: 1px solid var(--border); color: var(--text);
+  font: 800 .9rem/1 var(--font-display); font-variant-numeric: tabular-nums;
+  -webkit-print-color-adjust: exact; print-color-adjust: exact;
 }
+.sm-text-rank.sm-medal-gold, .sm-text-rank.sm-medal-silver, .sm-text-rank.sm-medal-bronze { color: #fff; border-color: transparent; }
+.sm-text-rank.sm-medal-gold { background: var(--gold); }
+.sm-text-rank.sm-medal-silver { background: var(--silver); }
+.sm-text-rank.sm-medal-bronze { background: var(--bronze); }
+.sm-text-body { min-width: 0; }
+/* Restaurant · address on one line; the map and Maps link carry the detail. */
+.sm-text-body .sm-item-place { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sm-text-body .sm-item-title { margin-bottom: 1px; }
+.sm-text-body .sm-item-note { margin: 1px 0 2px; }
+.sm-text-addr { color: var(--muted); font-weight: 400; }
+.sm-text-body .sm-links { gap: 12px; font-size: .82rem; margin-top: 2px; }
 
 .vw-error { max-width: 440px; margin: 40px auto; padding: 28px 24px; text-align: center; }
 .vw-error-icon { font-size: 2.5rem; margin: 0 0 8px; }
@@ -23,7 +38,9 @@
 
 @media print {
   .vw-bar { display: none; }
-  /* Let the compact print photo boxes size the placeholders too. */
-  .sm-guide--shared .sm-feature-img.sm-img-empty,
-  .sm-guide--shared .sm-feature-1 .sm-feature-img.sm-img-empty { aspect-ratio: auto; min-height: 0; height: 100%; font-size: 1.4rem; }
+  .sm-textlist { display: grid; grid-template-columns: 1fr 1fr; gap: 0 6mm; }
+  .sm-text-item { padding: 2mm 0; gap: 3mm; grid-template-columns: 22px minmax(0, 1fr); }
+  .sm-text-rank { width: 22px; height: 22px; font-size: 9pt; }
+  .sm-text-body .sm-item-title { font-size: 10.5pt; }
+  .sm-text-body .sm-item-place, .sm-text-body .sm-item-note { font-size: 8.5pt; }
 }

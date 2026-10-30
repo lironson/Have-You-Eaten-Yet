@@ -31,7 +31,7 @@ python3 -m http.server 8000
 Any static host works (e.g. GitHub Pages: Settings → Pages → deploy from branch). The friends QR
 needs the site on a public HTTPS URL, since a QR pointing at `localhost` won't open on other phones.
 PeerJS's free public broker is used only to introduce the phones; to test against a local
-PeerServer, add `?peerserver=127.0.0.1:9000` to the URL.
+PeerServer, add `?peerserver=127.0.0.1:9000` to the URL. Test Line.
 
 ## Layout
 
